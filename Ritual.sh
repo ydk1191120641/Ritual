@@ -271,6 +271,14 @@ else
   echo
   echo "使用新地址执行 call-contract..."
   project=hello-world make call-contract
+
+  # 重启容器
+  echo
+  echo "重启 docker compose..."
+  cd ~/infernet-container-starter || exit 1
+  docker compose -f deploy/docker-compose.yaml down
+  docker compose -f deploy/docker-compose.yaml up -d
+  echo "[提示] 查看 infernet-node 日志：docker logs infernet-node"
 fi
 
 echo
