@@ -2,7 +2,8 @@
 
 # 配置参数
 FOLDER="/var/lib/docker/overlay2"  # 要监控的文件夹路径
-MAX_SIZE_GB=10                      # 最大大小（单位：GB）
+MAX_SIZE_GB=5                      # 最大大小（单位：GB）
+TMAX_SIZE_GB=10                      # 最大大小（单位：GB）
 CHECK_INTERVAL=60                  # 检查间隔（单位：秒）
 COMMAND="echo '文件夹大小超过 ${MAX_SIZE_GB}GB，已执行命令'"  # 要执行的命令
 
@@ -28,16 +29,22 @@ while true; do
     # 比较大小（使用 bc 进行浮点数比较）
     EXCEEDS=$(echo "$SIZE_GB >= $MAX_SIZE_GB" | bc)
     if [ "$EXCEEDS" -eq 1 ]; then
-        echo "文件夹大小已超过 ${MAX_SIZE_GB}GB，执行命令..."
+        echo "文件夹大小已超过 ${MAX_SIZE_GB}GB，执行命令删除..."
+        docker exec infernet-anvil /bin/sh -c "find /root/.foundry/anvil/tmp/* -maxdepth 1 -name '*.json' -type f -delete"
+    fi
+
+    TEXCEEDS=$(echo "$SIZE_GB >= $TMAX_SIZE_GB" | bc)
+    if [ "$TEXCEEDS" -eq 1 ]; then
+        echo "文件夹大小已超过 ${TMAX_SIZE_GB}GB，执行命令部署..."
         if screen -list | grep -q "ritual"; then
-	       echo "[提示] 发现 ritual 会话正在运行，正在终止..."
-	    	  screen -S ritual -X quit
-	       sleep 1
-	   fi
+	        echo "[提示] 发现 ritual 会话正在运行，正在终止..."
+	    	screen -S ritual -X quit
+	        sleep 1
+	    fi
 	
-	   echo "在 screen -S ritual 会话中重新容器启动部署..."
-	   screen -S ritual -dm bash -c 'docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml down && docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml up -d && bash'
-	   sleep 1
+	    echo "在 screen -S ritual 会话中重新容器启动部署..."
+	    screen -S ritual -dm bash -c 'docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml down && docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml up -d && bash'
+	    sleep 1
     fi
 
     # 等待指定的时间间隔
