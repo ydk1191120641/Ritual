@@ -19,7 +19,10 @@ while true; do
     SIZE_KB=$(du -s "$FOLDER" 2>/dev/null | awk '{print $1}')
     if [ -z "$SIZE_KB" ]; then
         echo "错误：无法获取 $FOLDER 的大小，可能权限不足"
-        exit 1
+	# 等待指定的时间间隔
+	echo "等待指定的时间间隔：${CHECK_INTERVAL}秒"
+	sleep "$CHECK_INTERVAL"
+        continue
     fi
     SIZE_GB=$(echo "scale=2; $SIZE_KB / 1024 / 1024" | bc)
 
