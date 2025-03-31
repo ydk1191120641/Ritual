@@ -48,14 +48,14 @@ while true; do
     if [ "$TEXCEEDS" -eq 1 ]; then
         echo "文件夹大小已超过 ${TMAX_SIZE_GB}GB，执行命令部署..."
         if screen -list | grep -q "ritual"; then
-	        echo "[提示] 发现 ritual 会话正在运行，正在终止..."
-	    	screen -S ritual -X quit
-	        sleep 1
-	    fi
-	
-	    echo "在 screen -S ritual 会话中重新容器启动部署..."
-	    screen -S ritual -dm bash -c 'docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml down && docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml up -d && bash'
+	    echo "[提示] 发现 ritual 会话正在运行，正在终止..."
+	    screen -S ritual -X quit
 	    sleep 1
+	fi
+	
+	echo "在 screen -S ritual 会话中重新容器启动部署..."
+	screen -S ritual -dm bash -c 'docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml down && docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml up -d && bash'
+	sleep 1
     fi
 
     # 等待指定的时间间隔
