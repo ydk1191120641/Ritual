@@ -33,7 +33,18 @@ while true; do
         docker exec infernet-anvil /bin/sh -c "find /root/.foundry/anvil/tmp/* -maxdepth 1 -name '*.json' -type f -delete"
     fi
 
-    TEXCEEDS=$(echo "$SIZE_GB >= $TMAX_SIZE_GB" | bc)
+    # 使用 du 获取文件夹大小（单位：KB），然后转换为 GB
+    TSIZE_KB=$(du -s "$FOLDER" 2>/dev/null | awk '{print $1}')
+    if [ -z "$TSIZE_KB" ]; then
+        echo "错误：无法获取 $FOLDER 的大小，可能权限不足"
+        exit 1
+    fi
+    TSIZE_GB=$(echo "scale=2; $TSIZE_KB / 1024 / 1024" | bc)
+
+    # 打印当前大小
+    echo "当前文件夹 $FOLDER 大小：${TSIZE_GB}GB"
+
+    TEXCEEDS=$(echo "$TSIZE_GB >= $TMAX_SIZE_GB" | bc)
     if [ "$TEXCEEDS" -eq 1 ]; then
         echo "文件夹大小已超过 ${TMAX_SIZE_GB}GB，执行命令部署..."
         if screen -list | grep -q "ritual"; then
