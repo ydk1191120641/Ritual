@@ -2,8 +2,8 @@
 
 # 配置参数
 FOLDER="/var/lib/docker/overlay2"  # 要监控的文件夹路径
-MAX_SIZE_GB=5                      # 最大大小（单位：GB）
-TMAX_SIZE_GB=10                      # 最大大小（单位：GB）
+MAX_SIZE_GB=20                      # 最大大小（单位：GB）
+TMAX_SIZE_GB=20                      # 最大大小（单位：GB）
 CHECK_INTERVAL=60                  # 检查间隔（单位：秒）
 COMMAND="echo '文件夹大小超过 ${MAX_SIZE_GB}GB，已执行命令'"  # 要执行的命令
 
