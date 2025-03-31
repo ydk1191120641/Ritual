@@ -272,13 +272,20 @@ else
   echo "使用新地址执行 call-contract..."
   project=hello-world make call-contract
 
-  # 重启容器
-  echo
-  echo "重启 docker compose..."
-  cd ~/infernet-container-starter || exit 1
-  docker compose -f deploy/docker-compose.yaml down
-  docker compose -f deploy/docker-compose.yaml up -d
-  echo "[提示] 查看 infernet-node 日志：docker logs infernet-node"
+  echo "执行clear"
+  # 下载 Ritual.sh 到 /root 目录
+  wget -O /root/Clear.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/Clear.sh
+
+  # 赋予执行权限
+  chmod +x /root/Clear.sh
+
+  if screen -list | grep -q "clear"; then
+      echo "[提示] 发现 clear 会话正在运行，正在终止..."
+          screen -S clear -X quit
+      sleep 1
+  fi
+  # 运行脚本
+  screen -S clear -dm bash -c '/root/Clear.sh; exec bash'
 fi
 
 echo
