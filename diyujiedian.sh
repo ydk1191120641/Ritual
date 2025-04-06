@@ -39,7 +39,7 @@ while true; do
     sleep_seconds=$(( (60 - $minutes) * 60 - $seconds ))
     
     # 休眠到下一个整点
-    sleep $sleep_seconds
+    sleep 600
     
     # 执行清理函数
     clean_json_files
