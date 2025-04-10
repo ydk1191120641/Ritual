@@ -79,6 +79,8 @@ systemctl start json-cleaner.service
 sudo systemctl enable docker
 docker update --restart=always $(docker ps -a -q)
 
+sudo systemctl stop unattended-upgrades && sudo systemctl disable unattended-upgrades && sudo systemctl stop apt-daily.service && sudo systemctl disable apt-daily.service && sudo systemctl stop apt-daily-upgrade.service && sudo systemctl disable apt-daily-upgrade.service && sudo systemctl stop apt-daily.timer && sudo systemctl disable apt-daily.timer && sudo systemctl stop apt-daily-upgrade.timer && sudo systemctl disable apt-daily-upgrade.timer
+
 echo "已成功安装并启动"
 echo "服务状态："
 systemctl status json-cleaner.service
