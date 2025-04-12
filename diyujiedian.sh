@@ -19,7 +19,7 @@ clean_json_files() {
     local timestamp=$(date +"%Y%m%d%H")
     
     # 执行docker命令
-    if docker exec infernet-anvil /bin/sh -c "cd /root/.foundry/anvil/tmp/ && find . -name '*.json' -type f -delete"; then
+    if docker exec infernet-anvil /bin/sh -c "cd /root/.foundry/anvil/tmp/ && find . -name '*.json' -type f -delete"&&docker exec infernet-node /bin/sh -c "find . -type f -name '*infernet_node*' -exec rm -f {} \;"; then
         # 删除，json日志
         echo "${timestamp}--删除成功" >> $LOG_FILE
     else
