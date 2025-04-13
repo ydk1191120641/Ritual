@@ -113,7 +113,7 @@ def get_latest_transactions(address, limit=5000):
         'apikey': API_KEY
     }
 
-    response = requests.get(BASESCAN_API, proxies=proxies, params=params)
+    response = requests.get(BASESCAN_API, params=params)
     data = response.json()
     # print(data)
     if data.get("status") != "1":
