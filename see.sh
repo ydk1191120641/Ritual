@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 pip3 install requests pytz paramiko screen
-echo "检查 screen 会话 ritual 是否存在..." | tee -a "$LOG_FILE"
+echo "检查 screen 会话 ritual 是否存在..."
 if screen -list | grep -q "see"; then
     echo "[提示] 发现 see 会话正在运行，正在终止..."
     screen -S see -X quit
