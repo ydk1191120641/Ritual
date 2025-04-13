@@ -8,4 +8,4 @@ if screen -list | grep -q "see"; then
 fi
 
 echo "在 screen -S see 会话中开始容器部署" 
-screen -S see -dm bash -c 'wget -O see.py https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/see.py && sed -i 's/\r$//' see.py && chmod +x see.py && ./see.py'
+screen -S see -dm bash -c 'wget -O see.py https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/see.py && sed -i 's/\r$//' see.py && chmod +x see.py && python3 see.py'
