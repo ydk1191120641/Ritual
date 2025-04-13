@@ -6,8 +6,35 @@ import paramiko
 from concurrent.futures import ThreadPoolExecutor
 import queue
 import time
+import smtplib
+from email.message import EmailMessage
 
 walletsnum = {'0x06bd5eb9645A0733F8d2027A78a779fa6C42b08e':0}
+def send_email(sender_email, sender_password, recipient_email, subject, body):
+    # 创建邮件对象
+    msg = EmailMessage()
+    msg.set_content(body)  # 设置邮件正文
+    msg['Subject'] = subject  # 邮件主题
+    msg['From'] = sender_email  # 发件人
+    msg['To'] = recipient_email  # 收件人
+
+    try:
+        # 连接腾讯企业邮箱 SMTP 服务器（使用 SSL）
+        with smtplib.SMTP_SSL("smtp.exmail.qq.com", 465) as server:
+            # 登录邮箱
+            server.login(sender_email, sender_password)
+            # 发送邮件
+            server.send_message(msg)
+            print("邮件发送成功！")
+    except Exception as e:
+        print(f"邮件发送失败：{e}")
+
+# 配置参数
+sender_email = "yandaokun@ntmtkj.wecom.work"  # 替换为你的企业邮箱地址
+sender_password = "1993YDKgyq"  # 替换为你的邮箱密码或授权码
+recipient_email = "1983980885@qq.com"  # 替换为目标邮箱地址
+
+
 
 # 钱包地址数组
 wallets = [
@@ -151,6 +178,8 @@ def main(index, wallet):
         if walletsnum[wallet]!=n:
             walletsnum[wallet] = n
             print(f'钱包{wallet} 发钱新的验证了，总次数{n}')
+            send_email(sender_email, sender_password, recipient_email, f"地狱节点{wallet}", f'钱包{wallet} 发钱新的验证了，总次数{n}')
+    #         发送邮箱
     return ""
 
 
@@ -345,6 +374,7 @@ def sship(ip, result_queue):
     # list = []
     # for ip in ips:
     # 服务器连接信息
+    ips = ip
     ip = ip.split(":")
     host = ip[0]  # 替换为你的服务器 IP
     username = "root"  # 替换为你的用户名
@@ -360,6 +390,8 @@ def sship(ip, result_queue):
         if not ssh:
             # 发送邮箱
             if i == 9:  # 发送邮箱
+                # 调用发送函数
+                send_email(sender_email, sender_password, recipient_email, f"地狱节点{ips}服务器关机", f"地狱节点{ips}服务器关机")
                 pass
             return
         else:
