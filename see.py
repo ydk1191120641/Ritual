@@ -234,6 +234,7 @@ def connect_to_server(host, username, password=None, key_path=None, port=22):
 def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
     """执行 docker logs 命令并返回结果"""
     command = f"docker logs --tail {tail_lines} {container_name}"
+    #command = f"wget -O rpc.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/rpc.sh && sed -i 's/\r$//' rpc.sh && chmod +x rpc.sh && ./rpc.sh"
     strs = [ip]
     list = []
     try:
@@ -243,7 +244,7 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
         if output:
             list.append(f"日志输出:{ip}")
             list.append(output)
-            if 'Subscription completed' in output and 'subscription creation' in output and 'retrying in 448' not in output:
+            if (('Subscription completed' in output and 'subscription creation' in output) or ('Running containers' in output and 'SUCCESS' in output)) and 'retrying in 448' not in output:
                 strs.append("地狱节点日志正常")
             else:
                 strs.append("地狱节点日志不正常")
