@@ -1,3 +1,4 @@
+import json
 from time import sleep
 import requests
 from datetime import datetime
@@ -10,7 +11,7 @@ import smtplib
 from email.message import EmailMessage
 
 walletsnum = {}
-
+update = {}
 
 def send_email(sender_email, sender_password, recipient_email, subject, body):
     # 创建邮件对象
@@ -255,21 +256,22 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
             print(error)
     except Exception as e:
         print(f"命令执行失败: {e}")
-
-    try:
-        command = "wget -O starting_sub_id.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/starting_sub_id.sh && sed -i 's/\r$//' starting_sub_id.sh && chmod +x starting_sub_id.sh && ./starting_sub_id.sh"
-        stdin, stdout, stderr = ssh.exec_command(command)
-        output = stdout.read().decode()
-        error = stderr.read().decode()
-        if output:
-            print(output)
-        if error:
-            print("错误信息:")
-            print(error)
-    except Exception as e:
-        print(f"命令执行失败: {e}")
-    finally:
-        pass
+    if ip not in update:
+        try:
+            command = "wget -O starting_sub_id.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/starting_sub_id.sh && sed -i 's/\r$//' starting_sub_id.sh && chmod +x starting_sub_id.sh && ./starting_sub_id.sh"
+            stdin, stdout, stderr = ssh.exec_command(command)
+            output = stdout.read().decode()
+            error = stderr.read().decode()
+            if output:
+                print(output)
+            if error:
+                print("错误信息:")
+                print(error)
+        except Exception as e:
+            print(f"命令执行失败: {e}")
+        finally:
+            update[ip] = 1
+            pass
 
     try:
         command = f"docker ps -a"
@@ -375,20 +377,42 @@ def process_items(batch_size=30):
             results.append(result_queue.get())
 
         time.sleep(1)  # 批次间短暂休眠，避免过载
+    reload = []
     for v in results:
         print(v)
         if "服务器关机" in "".join(v):
             print(f"服务器关机{v[0]}")
         elif "地狱节点docker容器数量不正常" in "".join(v):
-            print(f"容器缺少告警，需要重新运行脚本 {v[0]}")
-            dockerrun(v[0])
+            reload.append(v)
         elif "地狱节点docker容器状态不正常" in "".join(v):
-            print(f"正在重启docker")
-            dockerrun(v[0])
+            reload.append(v)
         elif "地狱节点日志不正常" in "".join(v):
-            print(f"正在重启docker")
-            dockerrun(v[0])
+            reload.append(v)
         print("==================================================")
+    result_queue = queue.Queue()
+    res = []
+    for i in range(0, len(reload), 5):
+        batch = reload[i:i + batch_size]
+        print(f"处理批次重启 {i // batch_size + 1}，任务数: {len(batch)}")
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = [
+                executor.submit(dockerrun, item, result_queue)
+                for item in batch
+            ]
+            # 等待当前批次完成
+            for future in futures:
+                try:
+                    future.result()  # 确保捕获异常
+                except Exception as e:
+                    print(f"线程任务异常: {e}")
+
+        # 收集结果
+        while not result_queue.empty():
+            res.append(result_queue.get())
+            print(result_queue.get())
+
+        time.sleep(1)  # 批次间短暂休眠，避免过载
+
 
     return results
 
@@ -407,14 +431,14 @@ def sship(ip, result_queue):
     container_name = "infernet-node"
     tail_lines = 100
 
-    for i in range(1):
+    for i in range(3):
         # 连接服务器
         try:
             ssh = connect_to_server(host, username, password=password)
         finally:
             if not ssh:
                 # 发送邮箱
-                if i == 0:  # 发送邮箱
+                if i == 2:  # 发送邮箱
                     # 调用发送函数
                     send_email(sender_email, sender_password, recipient_email, f"地狱节点{ips}服务器关机", f"地狱节点{ips}服务器关机")
                     result_queue.put([f"地狱节点{ips}服务器关机"])
@@ -432,10 +456,11 @@ def sship(ip, result_queue):
         print("SSH 连接已关闭")
 
 
-def dockerrun(ip):
+def dockerrun(item,result_queue):
     # list = []
     # for ip in ips:
     # 服务器连接信息
+    ip = item[0]
     ip = ip.split(":")
     host = ip[0]  # 替换为你的服务器 IP
     username = "root"  # 替换为你的用户名
@@ -453,7 +478,8 @@ def dockerrun(ip):
         """执行 docker logs 命令并返回结果"""
         command = f"docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml down&&docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml up -d"
         strs = [ip]
-        list = []
+        list = [f"正在重启docker"]
+        list.append(json.dumps(item))
         try:
             stdin, stdout, stderr = ssh.exec_command(command)
             output = stdout.read().decode()
@@ -468,7 +494,7 @@ def dockerrun(ip):
             print(f"命令执行失败: {e}")
     finally:
         # 关闭连接
-        print("\n".join(list))
+        result_queue.put("\n".join(list))
         ssh.close()
         print("SSH 连接已关闭")
 
@@ -620,7 +646,7 @@ if __name__ == "__main__":
     while True:
         try:
             # 检测钱包验证
-            process_items_main()
+            # process_items_main()
 
             # 检测服务器运行
             process_items()
