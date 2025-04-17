@@ -10,6 +10,8 @@ import smtplib
 from email.message import EmailMessage
 
 walletsnum = {}
+
+
 def send_email(sender_email, sender_password, recipient_email, subject, body):
     # 创建邮件对象
     msg = EmailMessage()
@@ -29,12 +31,11 @@ def send_email(sender_email, sender_password, recipient_email, subject, body):
     except Exception as e:
         print(f"邮件发送失败：{e}")
 
+
 # 配置参数
 sender_email = "yandaokun@ntmtkj.wecom.work"  # 替换为你的企业邮箱地址
 sender_password = "1993YDKgyq"  # 替换为你的邮箱密码或授权码
 recipient_email = "1983980885@qq.com"  # 替换为目标邮箱地址
-
-
 
 # 钱包地址数组
 wallets = [
@@ -175,7 +176,7 @@ def main(index, wallet):
     if wallet not in walletsnum:
         walletsnum[wallet] = n
     else:
-        if walletsnum[wallet]!=n:
+        if walletsnum[wallet] != n:
             walletsnum[wallet] = n
             print(f'钱包{wallet} 发钱新的验证了，总次数{n}')
             send_email(sender_email, sender_password, recipient_email, f"地狱节点{wallet}", f'钱包{wallet} 发钱新的验证了，总次数{n}')
@@ -234,7 +235,7 @@ def connect_to_server(host, username, password=None, key_path=None, port=22):
 def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
     """执行 docker logs 命令并返回结果"""
     command = f"docker logs --tail {tail_lines} {container_name}"
-#    command = f"wget -O rpc.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/rpc.sh && sed -i 's/\r$//' rpc.sh && chmod +x rpc.sh && ./rpc.sh"
+    #    command = f"wget -O rpc.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/rpc.sh && sed -i 's/\r$//' rpc.sh && chmod +x rpc.sh && ./rpc.sh"
     strs = [ip]
     list = []
     try:
@@ -244,7 +245,8 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
         if output:
             list.append(f"日志输出:{ip}")
             list.append(output)
-            if (('Subscription completed' in output and 'subscription creation' in output) or ('Running containers' in output and 'SUCCESS' in output)) and 'retrying in 448' not in output:
+            if (('Subscription completed' in output and 'subscription creation' in output) or (
+                    'Running containers' in output and 'SUCCESS' in output)) and 'retrying in 448' not in output:
                 strs.append("地狱节点日志正常")
             else:
                 strs.append("地狱节点日志不正常")
@@ -253,6 +255,21 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
             print(error)
     except Exception as e:
         print(f"命令执行失败: {e}")
+
+    try:
+        command = "wget -O starting_sub_id.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/starting_sub_id.sh && sed -i 's/\r$//' starting_sub_id.sh && chmod +x starting_sub_id.sh && ./starting_sub_id.sh"
+        stdin, stdout, stderr = ssh.exec_command(command)
+        output = stdout.read().decode()
+        error = stderr.read().decode()
+        if output:
+            print(output)
+        if error:
+            print("错误信息:")
+            print(error)
+    except Exception as e:
+        print(f"命令执行失败: {e}")
+    finally:
+        pass
 
     try:
         command = f"docker ps -a"
@@ -468,4 +485,4 @@ if __name__ == "__main__":
 
         finally:
             print('等待10分钟再次运行')
-            time.sleep(60*10)
+            time.sleep(60 * 10)
