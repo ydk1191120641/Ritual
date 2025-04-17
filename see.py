@@ -9,7 +9,7 @@ import time
 import smtplib
 from email.message import EmailMessage
 
-walletsnum = {'0x06bd5eb9645A0733F8d2027A78a779fa6C42b08e':0}
+walletsnum = {}
 def send_email(sender_email, sender_password, recipient_email, subject, body):
     # 创建邮件对象
     msg = EmailMessage()
@@ -234,7 +234,7 @@ def connect_to_server(host, username, password=None, key_path=None, port=22):
 def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
     """执行 docker logs 命令并返回结果"""
     command = f"docker logs --tail {tail_lines} {container_name}"
-    #command = f"wget -O rpc.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/rpc.sh && sed -i 's/\r$//' rpc.sh && chmod +x rpc.sh && ./rpc.sh"
+#    command = f"wget -O rpc.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/rpc.sh && sed -i 's/\r$//' rpc.sh && chmod +x rpc.sh && ./rpc.sh"
     strs = [ip]
     list = []
     try:
@@ -360,7 +360,9 @@ def process_items(batch_size=30):
         time.sleep(1)  # 批次间短暂休眠，避免过载
     for v in results:
         print(v)
-        if "地狱节点docker容器数量不正常" in "".join(v):
+        if "服务器关机" in "".join(v):
+            print(f"服务器关机{v[0]}")
+        elif "地狱节点docker容器数量不正常" in "".join(v):
             print(f"容器缺少告警，需要重新运行脚本 {v[0]}")
             dockerrun(v[0])
         elif "地狱节点docker容器状态不正常" in "".join(v):
@@ -388,19 +390,21 @@ def sship(ip, result_queue):
     container_name = "infernet-node"
     tail_lines = 100
 
-    for i in range(10):
+    for i in range(1):
         # 连接服务器
-        ssh = connect_to_server(host, username, password=password)
-        if not ssh:
-            # 发送邮箱
-            if i == 9:  # 发送邮箱
-                # 调用发送函数
-                send_email(sender_email, sender_password, recipient_email, f"地狱节点{ips}服务器关机", f"地狱节点{ips}服务器关机")
-                pass
-            return
-        else:
-            break
-
+        try:
+            ssh = connect_to_server(host, username, password=password)
+        finally:
+            if not ssh:
+                # 发送邮箱
+                if i == 0:  # 发送邮箱
+                    # 调用发送函数
+                    send_email(sender_email, sender_password, recipient_email, f"地狱节点{ips}服务器关机", f"地狱节点{ips}服务器关机")
+                    result_queue.put([f"地狱节点{ips}服务器关机"])
+                    return
+                    pass
+            else:
+                break
     try:
         # 执行 docker logs 命令
         strs = execute_docker_logs(ssh, container_name, ":".join(ip), tail_lines)
