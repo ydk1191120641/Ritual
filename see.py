@@ -299,57 +299,7 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
 
 
 ips = [
-    '38.247.10.115:8R0f5GGEruv2Cm',
-    '38.247.9.103:8R0f5GGEruv2Cm',
-    '38.247.11.87:8R0f5GGEruv2Cm',
-    '38.247.15.69:8R0f5GGEruv2Cm',
-    '38.247.9.71:80ceA1r1gftpwe',
-    '38.247.14.89:qtarBMDY6343',
-    '38.247.12.92:8R0f5GGEruv2Cm',
-    '38.247.13.67:8R0f5GGEruv2Cm',
-    '38.247.14.84:8R0f5GGEruv2Cm',
-    '38.247.14.83:nctiASER1165',
-    '38.247.8.94:8R0f5GGEruv2Cm',
-    '38.247.9.89:tvvsHGEJ4165',
-    '38.247.11.113:ddmbUJRL1511',
-    '154.202.118.31:10qyHwTurwcfZmQ',
-    '154.202.119.89:10qyHwTurwcfZmQ',
-    '154.202.119.35:10qyHwTurwcfZmQ',
-    '154.202.118.252:10qyHwTurwcfZmQ',
-    '154.202.118.114:10qyHwTurwcfZmQ',
-    '38.247.11.90:7r1L8IpEwzegYN',
-    '38.247.10.90:7r1L8IpEwzegYN',
-    '38.247.11.99:7r1L8IpEwzegYN',
-    '38.247.9.126:7r1L8IpEwzegYN',
-    '38.247.9.86:7r1L8IpEwzegYN',
-    '38.247.8.86:8QsofS2MuHh15I',
-    '38.247.8.73:8QsofS2MuHh15I',
-    '38.247.15.90:8QsofS2MuHh15I',
-    '38.247.8.82:2SBzwhMrUGG4CR',
-    '38.247.12.74:2SBzwhMrUGG4CR',
-    '38.247.9.80:2SBzwhMrUGG4CR',
-    '38.247.14.77:2SBzwhMrUGG4CR',
-    '38.247.15.85:2SBzwhMrUGG4CR',
-    '38.247.8.89:2SBzwhMrUGG4CR',
-    '38.247.12.72:1BFxA644oPbE3z',
-    '38.247.14.87:1BFxA644oPbE3z',
-    '38.247.12.78:1BFxA644oPbE3z',
-    '38.247.15.93:1BFxA644oPbE3z',
-    '38.247.13.84:2CKJqn8xf5zfbf',
-    '38.247.13.90:2CKJqn8xf5zfbf',
-    '38.247.8.114:2CKJqn8xf5zfbf',
-    '154.202.118.210:10qyHwTurwcfZmQ',
-    '38.247.12.66:1BFxA644oPbE3z',
-    '38.247.10.106:1BFxA644oPbE3z',
-    '38.247.8.124:2CKJqn8xf5zfbf',
-    '38.247.11.88:2CKJqn8xf5zfbf',
-    '38.247.15.75:2CKJqn8xf5zfbf',
-    '38.247.14.81:myzbCDVD5735',
-    '38.247.10.123:2CKJqn8xf5zfbf',
     '156.239.40.237:xkkgATRF2869',
-    '38.247.9.116:xpxvARCN2980',
-    '38.247.10.77:tuwhPNJM8044',
-    '38.247.10.105:2CKJqn8xf5zfbf',
 ]
 
 
@@ -409,7 +359,6 @@ def process_items(batch_size=30):
         # 收集结果
         while not result_queue.empty():
             res.append(result_queue.get())
-            print(result_queue.get())
 
         time.sleep(1)  # 批次间短暂休眠，避免过载
 
@@ -646,7 +595,7 @@ if __name__ == "__main__":
     while True:
         try:
             # 检测钱包验证
-            # process_items_main()
+            process_items_main()
 
             # 检测服务器运行
             process_items()
