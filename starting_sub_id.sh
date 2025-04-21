@@ -1,4 +1,17 @@
-# 默认设置
+#!/bin/bash
+
+# 检查是否传入了 sub_id 参数
+if [ -z "$1" ]; then
+    sub_id="250000"
+else
+    # 获取 sub_id 参数
+    sub_id="$1"
+fi
+
+
+
+# 示例：打印 sub_id
+echo "接收到的 sub_id: $sub_id"
 RPC_URL="https://base.drpc.org/"
 RPC_URL_SUB="https://mainnet.base.org/"
 # 替换 registry 地址
@@ -23,8 +36,8 @@ sed -i "s|\"sleep\": [0-9]\+\(\.[0-9]\+\)\?|\"sleep\": $SLEEP|" /root/infernet-c
 
 sed -i "s|\"sync_period\": [0-9]\+\(\.[0-9]\+\)\?|\"sync_period\": 30|" /root/infernet-container-starter/deploy/config.json
 sed -i "s|\"sync_period\": [0-9]\+\(\.[0-9]\+\)\?|\"sync_period\": 30|" /root/infernet-container-starter/projects/hello-world/container/config.json
-sed -i "s|\"starting_sub_id\": [0-9]\+\(\.[0-9]\+\)\?|\"starting_sub_id\": 245000|" /root/infernet-container-starter/deploy/config.json
-sed -i "s|\"starting_sub_id\": [0-9]\+\(\.[0-9]\+\)\?|\"starting_sub_id\": 245000|" /root/infernet-container-starter/projects/hello-world/container/config.json
+sed -i "s|\"starting_sub_id\": [0-9]\+\(\.[0-9]\+\)\?|\"starting_sub_id\": $sub_id|" /root/infernet-container-starter/deploy/config.json
+sed -i "s|\"starting_sub_id\": [0-9]\+\(\.[0-9]\+\)\?|\"starting_sub_id\": $sub_id|" /root/infernet-container-starter/projects/hello-world/container/config.json
 # 修改 projects/hello-world/container/config.json
 
 sed -i "s|\"batch_size\": [0-9]*|\"batch_size\": $BATCH_SIZE|" /root/infernet-container-starter/projects/hello-world/container/config.json
