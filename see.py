@@ -9,7 +9,7 @@ import queue
 import time
 import smtplib
 from email.message import EmailMessage
-
+import re
 walletsnum = {}
 update = {}
 
@@ -231,8 +231,23 @@ def connect_to_server(host, username, password=None, key_path=None, port=22):
     except Exception as e:
         print(f"连接失败: {e} {host}")
         return None
-
-
+last_sub_id_map = {"last_sub_id":'245773'}
+def read_last_sub_id():
+    try:
+        with open("last_sub_id.txt", "r") as file:
+            last_sub_id = file.read().strip()
+            if last_sub_id:
+                print(f"从 last_sub_id.txt 读取到 last_sub_id={last_sub_id}")
+                return last_sub_id
+            else:
+                print("文件 last_sub_id.txt 为空")
+                return None
+    except FileNotFoundError:
+        print("错误：last_sub_id.txt 文件不存在")
+        return None
+    except Exception as e:
+        print(f"读取文件时发生错误：{str(e)}")
+        return None
 def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
     """执行 docker logs 命令并返回结果"""
     command = f"docker logs --tail {tail_lines} {container_name}"
@@ -249,6 +264,19 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
             if (('Subscription completed' in output and 'subscription creation' in output) or (
                     'Running containers' in output and 'SUCCESS' in output)) and 'retrying in 448' not in output:
                 strs.append("地狱节点日志正常")
+                if 'Running containers' in output and 'SUCCESS' in output:
+                    # 正则表达式
+                    pattern = r"sub id is: (\d+)"
+
+                    # 查找匹配
+                    match = re.search(pattern, output)
+                    # 提取值
+                    if match:
+                        last_sub_id = match.group(1)
+                        last_sub_id_map['last_sub_id'] = str(int(last_sub_id)-1)
+
+                    else:
+                        print("未找到 last_sub_id 的值")
             else:
                 strs.append("地狱节点日志不正常")
         if error:
@@ -257,8 +285,9 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
     except Exception as e:
         print(f"命令执行失败: {e}")
     if ip not in update:
+        sub_id = read_last_sub_id()
         try:
-            command = "wget -O starting_sub_id.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/starting_sub_id.sh && sed -i 's/\r$//' starting_sub_id.sh && chmod +x starting_sub_id.sh && ./starting_sub_id.sh"
+            command = "wget -O starting_sub_id.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/starting_sub_id.sh && sed -i 's/\r$//' starting_sub_id.sh && chmod +x starting_sub_id.sh && ./starting_sub_id.sh "+sub_id
             stdin, stdout, stderr = ssh.exec_command(command)
             output = stdout.read().decode()
             error = stderr.read().decode()
@@ -599,7 +628,10 @@ if __name__ == "__main__":
 
             # 检测服务器运行
             process_items()
-
+            # 写入 last_sub_id.txt 文件
+            with open("last_sub_id.txt", "w") as file:
+                file.write(last_sub_id_map['last_sub_id'])
+            print(f"成功将 last_sub_id={last_sub_id} 写入 last_sub_id.txt")
         finally:
             print('等待10分钟再次运行')
             time.sleep(60 * 10)
