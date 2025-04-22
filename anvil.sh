@@ -23,8 +23,7 @@ echo "正在处理目录: $TARGET_DIR"
 # 3. 重命名子文件夹
 for folder in "$TARGET_DIR"/*; do
     if [ -d "$folder" ]; then
-        # 生成随机字符串
-        NEW_NAME=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
+        NEW_NAME=$(head /dev/urandom | tr -dc 'a-zA-Z0-9' | head -c 10)
         PARENT_DIR=$(dirname "$folder")
         mv "$folder" "$PARENT_DIR/$NEW_NAME"
         echo "将 $(basename "$folder") 重命名为 $NEW_NAME"
