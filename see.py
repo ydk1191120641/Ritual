@@ -248,6 +248,7 @@ def read_last_sub_id():
     except Exception as e:
         print(f"读取文件时发生错误：{str(e)}")
         return None
+
 def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
     """执行 docker logs 命令并返回结果"""
     command = f"docker logs --tail {tail_lines} {container_name}"
@@ -315,6 +316,21 @@ ips = [
     '156.239.40.237:xkkgATRF2869',
 ]
 
+def anvil(ssh):
+    try:
+        command = "./anvil.sh"
+        stdin, stdout, stderr = ssh.exec_command(command)
+        output = stdout.read().decode()
+        error = stderr.read().decode()
+        if output:
+            print(output)
+        if error:
+            print("错误信息:")
+            print(error)
+    except Exception as e:
+        print(f"命令执行失败: {e}")
+    finally:
+        pass
 
 def process_items(batch_size=30):
     """多线程处理数据，每次 batch_size 个"""
@@ -351,6 +367,7 @@ def process_items(batch_size=30):
             reload.append(v)
         elif "地狱节点日志不正常" in "".join(v):
             reload.append(v)
+
         print("==================================================")
     result_queue = queue.Queue()
     res = []
@@ -412,6 +429,7 @@ def sship(ip, result_queue):
         # 执行 docker logs 命令
         strs = execute_docker_logs(ssh, container_name, ":".join(ip), tail_lines)
     finally:
+        anvil(ssh)
         # 关闭连接
         ssh.close()
         result_queue.put(strs)
