@@ -284,23 +284,7 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
             print(error)
     except Exception as e:
         print(f"命令执行失败: {e}")
-    if ip not in update:
-        sub_id = read_last_sub_id()
-        try:
-            command = "wget -O starting_sub_id.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/starting_sub_id.sh && sed -i 's/\r$//' starting_sub_id.sh && chmod +x starting_sub_id.sh && ./starting_sub_id.sh "+sub_id
-            stdin, stdout, stderr = ssh.exec_command(command)
-            output = stdout.read().decode()
-            error = stderr.read().decode()
-            if output:
-                print(output)
-            if error:
-                print("错误信息:")
-                print(error)
-        except Exception as e:
-            print(f"命令执行失败: {e}")
-        finally:
-            update[ip] = 1
-            pass
+
 
     try:
         command = f"docker ps -a"
@@ -385,7 +369,7 @@ def process_items(batch_size=30):
                 except Exception as e:
                     print(f"线程任务异常: {e}")
 
-        # 收集结果
+        # 收集结果d
         while not result_queue.empty():
             res.append(result_queue.get())
 
@@ -452,6 +436,24 @@ def dockerrun(item,result_queue):
     ssh = connect_to_server(host, username, password=password)
     if not ssh:
         return
+    # 先更新sub_id
+    sub_id = read_last_sub_id()
+    if sub_id:
+        try:
+            command = "wget -O starting_sub_id.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/starting_sub_id.sh && sed -i 's/\r$//' starting_sub_id.sh && chmod +x starting_sub_id.sh && ./starting_sub_id.sh " + sub_id
+            stdin, stdout, stderr = ssh.exec_command(command)
+            output = stdout.read().decode()
+            error = stderr.read().decode()
+            if output:
+                print(output)
+            if error:
+                print("错误信息:")
+                print(error)
+        except Exception as e:
+            print(f"命令执行失败: {e}")
+        finally:
+            pass
+
     try:
         """执行 docker logs 命令并返回结果"""
         command = f"docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml down&&docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml up -d"
@@ -475,6 +477,7 @@ def dockerrun(item,result_queue):
         result_queue.put("\n".join(list))
         ssh.close()
         print("SSH 连接已关闭")
+
 
 ip_list = [
     "38.247.14.73",
