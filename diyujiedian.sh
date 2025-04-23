@@ -34,6 +34,8 @@ clean_json_files() {
         # 记录错误
         echo "${timestamp}--删除失败" >> $LOG_FILE
     fi
+    # 运行anvil.sh
+    ./anvil.sh
 }
 
 # 立即执行一次
