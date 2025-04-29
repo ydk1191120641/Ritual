@@ -154,6 +154,7 @@ def main(index, wallet):
             sleep(1)  # 每次失败后等 3 秒再试
     # 如果 transactions 为空也继续打印逻辑
     n = 0
+    ee = 0
     t = ""
     list = [f"\n📬 第 {index} 个钱包地址: {wallet}"]
     if not transactions:
@@ -165,7 +166,10 @@ def main(index, wallet):
             if tx.get('contractAddress', ''):
                 list.append(f"    合约地址: {tx['contractAddress']}")
             if tx['to'].upper() == '0XD85EE50DA419CC5AF83A1E70A91D5C630B8C650A'.upper():
-                n += 1
+                if tx.get('isError', '')!='0':
+                    ee += 1
+                else:
+                    n += 1
         except Exception as e:
             print(f"     ⚠️ 处理交易失败: {e}")
             continue
@@ -180,7 +184,7 @@ def main(index, wallet):
         if walletsnum[wallet] != n:
             walletsnum[wallet] = n
             print(f'钱包{wallet} 发钱新的验证了，总次数{n}')
-            send_email(sender_email, sender_password, recipient_email, f"地狱节点{wallet}", f'钱包{wallet} 发钱新的验证了，总次数{n}')
+            send_email(sender_email, sender_password, recipient_email, f"地狱节点{wallet}", f'钱包{wallet} 验证成功总次数{n}，验证失败总次数{ee}')
     #         发送邮箱
     return ""
 
