@@ -298,7 +298,8 @@ else
   echo "执行diyujiedian"
   # 下载 Ritual.sh 到 /root 目录
   wget -O /root/diyujiedian.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/diyujiedian.sh
-
+  wget -O /root/anvil.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/anvil.sh
+  chmod +x /root/anvil.sh
   # 赋予执行权限
   chmod +x /root/diyujiedian.sh
 
