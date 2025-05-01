@@ -110,7 +110,7 @@ cd ~ || exit 1
 mkdir -p foundry
 cd foundry
 curl -L https://foundry.paradigm.xyz | bash
-
+source /root/.bashrc
 # 安装或更新
 $HOME/.foundry/bin/foundryup
 
