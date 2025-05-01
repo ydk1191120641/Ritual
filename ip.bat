@@ -45,7 +45,7 @@ echo "Dante configuration has been updated."
 sudo useradd -m 888 --badname
 
 # 设置新用户的密码
-new_password="888"
+new_password="idc129CN"
 echo "888:$new_password" | sudo chpasswd
 
 # 检查密码是否设置成功
