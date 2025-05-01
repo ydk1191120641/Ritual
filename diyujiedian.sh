@@ -1,5 +1,5 @@
 #!/bin/bash
-wget -O anvil.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/anvil.sh && sed -i 's/\r$//' anvil.sh && chmod +x anvil.sh
+
 # 创建清理脚本
 cat > /root/json_cleaner.sh << 'EOF'
 #!/bin/bash
