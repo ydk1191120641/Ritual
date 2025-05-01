@@ -260,8 +260,8 @@ cd ~/infernet-container-starter/projects/hello-world/contracts || exit 1
 rm -rf lib/forge-std
 rm -rf lib/infernet-sdk
 
-forge install --no-commit foundry-rs/forge-std
-forge install --no-commit ritual-net/infernet-sdk
+forge install foundry-rs/forge-std
+forge install ritual-net/infernet-sdk
 
 # 重启容器
 echo
