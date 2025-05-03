@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # 提取 MergedDir
 MERGED_DIR=$(docker inspect infernet-anvil | jq -r '.[0].GraphDriver.Data.MergedDir')
 
