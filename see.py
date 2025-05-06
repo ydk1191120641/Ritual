@@ -284,6 +284,8 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
                         print("未找到 last_sub_id 的值")
             else:
                 strs.append("地狱节点日志不正常")
+        else:
+            strs.append("地狱节点日志不正常")
         if error:
             print("错误信息:")
             print(error)
@@ -292,7 +294,7 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
 
 
     try:
-        command = f"docker ps -a"
+        command = 'docker ps -a --filter "name=infernet-node" --filter "name=infernet-anvil" --filter "name=infernet-redis" --filter "name=infernet-fluentbit" --filter "name=hello-world"'
         stdin, stdout, stderr = ssh.exec_command(command)
         output = stdout.read().decode()
         error = stderr.read().decode()
@@ -306,6 +308,8 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
                 strs.append("地狱节点docker容器状态不正常")
             else:
                 strs.append("地狱节点docker容器状态正常")
+        else:
+            strs.append("地狱节点docker容器状态不正常")        
         if error:
             print("错误信息:")
             print(error)
@@ -316,13 +320,64 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
         return strs
 
 
+
 ips = [
     '156.239.40.237:xkkgATRF2869',
+    '38.247.8.113:idc129.CN',
+    '38.247.8.103:idc129.CN',
+    '38.247.8.71:idc129.CN',
+    '38.247.8.99:idc129.CN',
+    '38.247.14.78:idc129.CN',
+    '38.247.12.83:idc129.CN',
+    '38.247.13.70:idc129.CN',
+    '38.247.9.119:idc129.CN',
+    '38.247.11.79:idc129.CN',
+    '38.247.10.100:idc129.CN',
+    '38.247.12.75:idc129.CN',
+    '38.247.8.106:idc129.CN',
+    '38.247.11.81:idc129.CN',
+    '38.247.10.115:idc129.CN',
+    '38.247.10.114:idc129.CN',
+    '38.247.14.92:idc129.CN',
+    '38.247.8.91:idc129.CN',
+    '38.247.12.76:idc129.CN',
+    '38.247.11.89:idc129.CN',
+    '38.247.11.83:idc129.CN',
+    '38.247.11.72:idc129.CN',
+    '38.247.10.84:idc129.CN',
+    '38.247.10.69:idc129.CN',
+    '38.247.10.83:idc129.CN',
+    '38.247.8.101:idc129.CN',
+    '38.247.9.105:idc129.CN',
+    '38.247.10.76:idc129.CN',
+    '38.247.13.81:idc129.CN',
+    '38.247.11.75:idc129.CN',
+    '38.247.8.90:idc129.CN',
+    '38.247.10.71:idc129.CN',
+    '38.247.10.126:idc129.CN',
+    '38.247.15.77:idc129.CN',
+    '38.247.8.73:idc129.CN',
+    '38.247.9.87:idc129.CN',
+    '38.247.8.82:idc129.CN',
+    '38.247.11.117:idc129.CN',
+    '38.247.12.82:idc129.CN',
+    '38.247.9.117:idc129.CN',
+    '38.247.9.80:idc129.CN',
+    '38.247.11.104:idc129.CN',
+    '38.247.8.94:idc129.CN',
+    '38.247.14.82:idc129.CN',
+    '38.247.10.93:idc129.CN',
+    '38.247.8.85:idc129.CN',
+    '38.247.8.102:idc129.CN',
+    '38.247.8.70:idc129.CN',
+    '38.247.11.99:idc129.CN',
+    '38.247.9.99:idc129.CN',
+    '38.247.11.115:idc129.CN',
 ]
 
 def anvil(ssh):
     try:
-        command = "./anvil.sh"
+        command = "/root/anvil.sh"
         stdin, stdout, stderr = ssh.exec_command(command)
         output = stdout.read().decode()
         error = stderr.read().decode()
@@ -368,6 +423,12 @@ def process_items(batch_size=30):
         elif "地狱节点docker容器数量不正常" in "".join(v):
             reload.append(v)
         elif "地狱节点docker容器状态不正常" in "".join(v):
+            reload.append(v)
+        elif "aztec docker容器数量不正常" in "".join(v):
+            v.append('aztec')
+            reload.append(v)
+        elif "aztec docker容器状态不正常" in "".join(v):
+            v.append('aztec')
             reload.append(v)
         elif "地狱节点日志不正常" in "".join(v):
             reload.append(v)
@@ -444,6 +505,7 @@ def dockerrun(item,result_queue):
     # list = []
     # for ip in ips:
     # 服务器连接信息
+    tt = item[len(item)-1]
     ip = item[0]
     ip = ip.split(":")
     host = ip[0]  # 替换为你的服务器 IP
@@ -458,47 +520,72 @@ def dockerrun(item,result_queue):
     ssh = connect_to_server(host, username, password=password)
     if not ssh:
         return
-    # 先更新sub_id
-    sub_id = read_last_sub_id()
-    if sub_id:
+    if tt=='aztec':
         try:
-            command = "wget -O starting_sub_id.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/starting_sub_id.sh && sed -i 's/\r$//' starting_sub_id.sh && chmod +x starting_sub_id.sh && ./starting_sub_id.sh " + sub_id
-            stdin, stdout, stderr = ssh.exec_command(command)
-            output = stdout.read().decode()
-            error = stderr.read().decode()
-            if output:
-                print(output)
-            if error:
-                print("错误信息:")
-                print(error)
-        except Exception as e:
-            print(f"命令执行失败: {e}")
+            """执行 docker logs 命令并返回结果"""
+            command = f"docker-compose down&&docker-compose up -d"
+            strs = [ip]
+            list = [f"正在重启docker"]
+            list.append(json.dumps(item))
+            try:
+                stdin, stdout, stderr = ssh.exec_command(command)
+                output = stdout.read().decode()
+                error = stderr.read().decode()
+                if output:
+                    list.append(f"日志输出:{ip}")
+                    list.append(output)
+                if error:
+                    print("错误信息:")
+                    print(error)
+            except Exception as e:
+                print(f"命令执行失败: {e}")
         finally:
-            pass
+            # 关闭连接
+            result_queue.put("\n".join(list))
+            ssh.close()
+            print("SSH 连接已关闭")
+    else:
+        # 先更新sub_id
+        sub_id = read_last_sub_id()
+        if sub_id:
+            try:
+                command = "wget -O starting_sub_id.sh https://raw.githubusercontent.com/ydk1191120641/Ritual/refs/heads/main/starting_sub_id.sh && sed -i 's/\r$//' starting_sub_id.sh && chmod +x starting_sub_id.sh && ./starting_sub_id.sh " + sub_id
+                stdin, stdout, stderr = ssh.exec_command(command)
+                output = stdout.read().decode()
+                error = stderr.read().decode()
+                if output:
+                    print(output)
+                if error:
+                    print("错误信息:")
+                    print(error)
+            except Exception as e:
+                print(f"命令执行失败: {e}")
+            finally:
+                pass
 
-    try:
-        """执行 docker logs 命令并返回结果"""
-        command = f"docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml down&&docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml up -d"
-        strs = [ip]
-        list = [f"正在重启docker"]
-        list.append(json.dumps(item))
         try:
-            stdin, stdout, stderr = ssh.exec_command(command)
-            output = stdout.read().decode()
-            error = stderr.read().decode()
-            if output:
-                list.append(f"日志输出:{ip}")
-                list.append(output)
-            if error:
-                print("错误信息:")
-                print(error)
-        except Exception as e:
-            print(f"命令执行失败: {e}")
-    finally:
-        # 关闭连接
-        result_queue.put("\n".join(list))
-        ssh.close()
-        print("SSH 连接已关闭")
+            """执行 docker logs 命令并返回结果"""
+            command = f"docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml down&&docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml up -d"
+            strs = [ip]
+            list = [f"正在重启docker"]
+            list.append(json.dumps(item))
+            try:
+                stdin, stdout, stderr = ssh.exec_command(command)
+                output = stdout.read().decode()
+                error = stderr.read().decode()
+                if output:
+                    list.append(f"日志输出:{ip}")
+                    list.append(output)
+                if error:
+                    print("错误信息:")
+                    print(error)
+            except Exception as e:
+                print(f"命令执行失败: {e}")
+        finally:
+            # 关闭连接
+            result_queue.put("\n".join(list))
+            ssh.close()
+            print("SSH 连接已关闭")
 
 
 ip_list = [
