@@ -182,9 +182,10 @@ def main(index, wallet):
         walletsnum[wallet] = n
     else:
         if walletsnum[wallet] != n:
+            mn = walletsnum[wallet]
             walletsnum[wallet] = n
             print(f'钱包{wallet} 发钱新的验证了，总次数{n}')
-            send_email(sender_email, sender_password, recipient_email, f"地狱节点{wallet}", f'钱包{wallet} 验证成功总次数{n}，验证失败总次数{ee}')
+            send_email(sender_email, sender_password, recipient_email, f"地狱节点{wallet}", f'钱包{wallet} 验证成功总次数{n}，验证失败总次数{ee}，上次成功次数{mn}')
     #         发送邮箱
     return ""
 
@@ -309,7 +310,7 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
             else:
                 strs.append("地狱节点docker容器状态正常")
         else:
-            strs.append("地狱节点docker容器状态不正常")        
+            strs.append("地狱节点docker容器状态不正常")
         if error:
             print("错误信息:")
             print(error)
