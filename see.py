@@ -566,7 +566,7 @@ def dockerrun(item,result_queue):
 
         try:
             """执行 docker logs 命令并返回结果"""
-            command = f"docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml down&&docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml up -d"
+            command = f"docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml down -v&&docker compose -f /root/infernet-container-starter/deploy/docker-compose.yaml up -d"
             strs = [ip]
             list = [f"正在重启docker"]
             list.append(json.dumps(item))
