@@ -225,8 +225,8 @@ sed -i "s|\"sleep\": [0-9]\+\(\.[0-9]\+\)\?|\"sleep\": $SLEEP|" /root/infernet-c
 
 sed -i "s|\"sync_period\": [0-9]\+\(\.[0-9]\+\)\?|\"sync_period\": 30|" /root/infernet-container-starter/deploy/config.json
 sed -i "s|\"sync_period\": [0-9]\+\(\.[0-9]\+\)\?|\"sync_period\": 30|" /root/infernet-container-starter/projects/hello-world/container/config.json
-sed -i "s|\"starting_sub_id\": [0-9]\+\(\.[0-9]\+\)\?|\"starting_sub_id\": 244000|" /root/infernet-container-starter/deploy/config.json
-sed -i "s|\"starting_sub_id\": [0-9]\+\(\.[0-9]\+\)\?|\"starting_sub_id\": 244000|" /root/infernet-container-starter/projects/hello-world/container/config.json
+sed -i "s|\"starting_sub_id\": [0-9]\+\(\.[0-9]\+\)\?|\"starting_sub_id\": 254469|" /root/infernet-container-starter/deploy/config.json
+sed -i "s|\"starting_sub_id\": [0-9]\+\(\.[0-9]\+\)\?|\"starting_sub_id\": 254469|" /root/infernet-container-starter/projects/hello-world/container/config.json
 # 修改 projects/hello-world/container/config.json
 
 sed -i "s|\"batch_size\": [0-9]*|\"batch_size\": $BATCH_SIZE|" /root/infernet-container-starter/projects/hello-world/container/config.json
