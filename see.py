@@ -267,7 +267,10 @@ def execute_docker_logs(ssh, container_name, ip, tail_lines=100):
         if output:
             list.append(f"日志输出:{ip}")
             list.append(output)
-            if (('Subscription completed' in output and 'subscription creation' in output) or (
+            retry_count = output.lower().count("retrying")
+            if retry_count>5:
+            	strs.append("地狱节点日志不正常")
+            elif (('Subscription completed' in output and 'subscription creation' in output) or (
                     'Running containers' in output and 'SUCCESS' in output)) and 'retrying in 448' not in output:
                 strs.append("地狱节点日志正常")
                 if 'Running containers' in output and 'SUCCESS' in output:
