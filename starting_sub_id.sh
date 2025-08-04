@@ -12,8 +12,8 @@ fi
 
 # 示例：打印 sub_id
 echo "接收到的 sub_id: $sub_id"
-RPC_URL="https://mainnet.base.org"
-RPC_URL_SUB="https://mainnet.base.org/"
+# RPC_URL="https://mainnet.base.org"
+# RPC_URL_SUB="https://mainnet.base.org/"
 # 替换 registry 地址
 REGISTRY="0x3B1554f346DFe5c482Bb4BA31b880c1C18412170"
 SLEEP=3
@@ -28,8 +28,8 @@ INFERNET_VERSION="1.4.0"  # infernet 镜像标签
  
 
 # 修改 deploy/config.json
-sed -i 's|"rpc_url": ".*"|"rpc_url": "https://mainnet.base.org"|' /root/infernet-container-starter/deploy/config.json
-sed -i 's|"rpc_url": ".*"|"rpc_url": "https://mainnet.base.org"|' /root/infernet-container-starter/projects/hello-world/container/config.json
+# sed -i 's|"rpc_url": ".*"|"rpc_url": "https://mainnet.base.org"|' /root/infernet-container-starter/deploy/config.json
+# sed -i 's|"rpc_url": ".*"|"rpc_url": "https://mainnet.base.org"|' /root/infernet-container-starter/projects/hello-world/container/config.json
 sed -i "s|\"batch_size\": [0-9]*|\"batch_size\": $BATCH_SIZE|" /root/infernet-container-starter/deploy/config.json
 sed -i "s|\"sleep\": [0-9]\+\(\.[0-9]\+\)\?|\"sleep\": $SLEEP|" /root/infernet-container-starter/deploy/config.json
 sed -i "s|\"sleep\": [0-9]\+\(\.[0-9]\+\)\?|\"sleep\": $SLEEP|" /root/infernet-container-starter/projects/hello-world/container/config.json
@@ -44,9 +44,9 @@ sed -i "s|\"batch_size\": [0-9]*|\"batch_size\": $BATCH_SIZE|" /root/infernet-co
 
 
 # 修改 Deploy.s.sol
-sed -i "s|\(RPC_URL\s*=\s*\).*|\1\"$RPC_URL\";|" /root/infernet-container-starter/projects/hello-world/contracts/script/Deploy.s.sol
+# sed -i "s|\(RPC_URL\s*=\s*\).*|\1\"$RPC_URL\";|" /root/infernet-container-starter/projects/hello-world/contracts/script/Deploy.s.sol
 
 # 使用 latest node 镜像
 # 修改 Makefile (sender, RPC_URL)
 MAKEFILE_PATH="/root/infernet-container-starter/projects/hello-world/contracts/Makefile"
-sed -i "s|^RPC_URL := .*|RPC_URL := $RPC_URL|"    "$MAKEFILE_PATH"
+# sed -i "s|^RPC_URL := .*|RPC_URL := $RPC_URL|"    "$MAKEFILE_PATH"
